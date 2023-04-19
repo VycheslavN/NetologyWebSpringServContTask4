@@ -1,12 +1,15 @@
 package org.example.service;
 
+import org.springframework.stereotype.Service;
 import org.example.exception.NotFoundException;
 import org.example.model.Post;
 import org.example.repository.PostRepository;
 
 import java.util.List;
 
+@Service
 public class PostService {
+    // сервис завязан на интерфейс, а не на конкретную реализацию
     private final PostRepository repository;
 
     public PostService(PostRepository repository) {

@@ -1,4 +1,4 @@
-# Домашнее задание к занятию «2.2. Dependency Lookup, Dependency Injection, IoC, Spring, Application Context»
+# Домашнее задание к занятию «2.3. Spring Web MVC»
 В качестве решения пришлите ссылки на ваши GitHub-проекты в личном кабинете студента на сайте netology.ru.
 
 ### Важная информация
@@ -6,28 +6,53 @@
 Перед стартом работы изучите, пожалуйста, ссылки на главной странице репозитория с домашними заданиями.
 Если у вас что-то не получилось, тогда оформляйте Issue по установленным правилам.
 ## Как сдавать задачи
-Возьмите проект с предыдущей лекции.
-Создайте в нём ветки feature/di-annotation и feature/di-java, в которых реализуйте соответствующую функциональность.
-Сделайте пуш, удостоверьтесь, что ваш код появился на GitHub, и создайте Pull Request из обеих веток.
-Ссылку на Pull Request отправьте в личном кабинете на сайте netology.ru.
-## DI
+Создайте на вашем компьютере Maven-проект.
+Инициализируйте в нём пустой Git-репозиторий.
+Добавьте в него готовый файл .gitignore.
+Добавьте в этот же каталог остальные необходимые файлы.
+Сделайте необходимые коммиты.
+Создайте публичный репозиторий на GitHub и свяжите свой локальный репозиторий с удалённым.
+Сделайте пуш и удостоверьтесь, что ваш код появился на GitHub.
+Ссылку на ваш проект отправьте в личном кабинете на сайте netology.ru.
+## Migration
 ### Легенда
-В рамках лекции мы посмотрели, как использовать Spring для связывания зависимостей.
+Первая задача простая: нужно смигрировать ваше приложение на сервлетах, написанное в предыдущих домашних заданиях, на Spring Web MVC с Embed Tomcat.
 
-Возникает вопрос, почему бы не использовать его в вашем приложении с сервлетами и не заменить указанный ниже код на DI со Spring:
-
-@Override
-public void init() {
-    final var repository = new PostRepository();
-    final var service = new PostService(repository);
-    controller = new PostController(service);
-}
 ### Задача
-Замените код в методе init на DI со Spring с использованием методов конфигурирования бинов:
+Создайте новый проект на базе Spring MVC и Embed Tomcat и перенесите реализованную в предыдущих домашних заданиях функциональность.
 
-Annotation Config — ветка feature/di-annotation.
-Java Config — ветка feature/di-java.
+Ваш контроллер должен выглядеть именно так, как в лекции:
+
+@RestController
+@RequestMapping("/api/posts")
+public class PostController {
+private final PostService service;
+
+public PostController(PostService service) {
+this.service = service;
+}
+
+@GetMapping
+public List<Post> all() {
+return service.all();
+}
+
+@GetMapping("/{id}")
+public Post getById(@PathVariable long id) {
+return service.getById(id);
+}
+
+@PostMapping
+public Post save(@RequestBody Post post) {
+return service.save(post);
+}
+
+@DeleteMapping("/{id}")
+public void removeById(long id) {
+service.removeById(id);
+}
+}
 Обратите внимание, что вся функциональность (CRUD), реализованная до этого, должна по-прежнему работать.
 
 ### Результат
-В качестве решения пришлите ссылку на ваши Pull Request в личном кабинете студента на сайте netology.ru.
+В качестве результата пришлите ссылку на ваш GitHub-проект в личном кабинете студента на сайте netology.ru.
