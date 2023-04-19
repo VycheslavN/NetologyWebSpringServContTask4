@@ -1,16 +1,48 @@
 package org.example.repository;
 
+import org.springframework.stereotype.Repository;
 import org.example.model.Post;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 
-public interface PostRepository {
-    List<Post> all();
+import static java.util.Optional.*;
 
-    Optional<Post> getById(long id);
+@Repository
+public class PostRepository {
+    private static final long EMPTY = 0;
 
-    Post save(Post post);
+    private final AtomicLong lastId;
+    private final Map<Long, Post> storage;
 
-    void removeById(long id);
+    public PostRepository() {
+        lastId = new AtomicLong();
+        storage = new ConcurrentHashMap<>();
+    }
+
+    public List<Post> all() {
+        return List.copyOf(storage.values());
+    }
+
+    public Optional<Post> getById(long id) {
+        return id == EMPTY ? empty() : ofNullable(storage.get(id));
+    }
+
+    public Post save(Post post) {
+        return getById(post.getId())
+                .map(Post::getId)
+                .or(() -> of(lastId.incrementAndGet()))
+                .map(id -> {
+                    post.setId(id);
+                    storage.put(id, post);
+                    return post;
+                }).orElseThrow();
+    }
+
+    public void removeById(long id) {
+        storage.remove(id);
+    }
 }
